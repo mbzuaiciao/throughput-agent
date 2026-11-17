@@ -1,0 +1,32 @@
+---
+import "../styles/global.css";
+const { title, description = "Interactive research notes on ML training throughput." } = Astro.props;
+const nav = [
+  { href: "/", name: "Overview" },
+  { href: "/learn", name: "Learn" },
+  { href: "/experiments", name: "Experiments" },
+  { href: "/research", name: "Research" },
+];
+const current = Astro.url.pathname.replace(/\/$/, "") || "/";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title} · Throughput Agent</title>
+  </head>
+  <body>
+    <header>
+      <div class="shell header-inner">
+        <a class="brand" href="/">Throughput <span>Agent</span></a>
+        <nav aria-label="Primary navigation">
+          {nav.map(item => <a href={item.href} aria-current={current === item.href ? "page" : undefined}>{item.name}</a>)}
+        </nav>
+      </div>
+    </header>
+    <main class="shell"><slot /></main>
+    <footer><div class="shell">Learning interface · Measurements shown only when backed by real experiment data.</div></footer>
+  </body>
+</html>

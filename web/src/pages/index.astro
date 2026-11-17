@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Overview">
+  <div class="eyebrow">Research lab / Overview</div>
+  <h1>Can AI agents discover training speedups that transfer?</h1>
+  <p class="lead">This project tests whether an optimization agent improves neural-network training throughput on unfamiliar models and GPUs—not just on the development cases it has already seen.</p>
+  <div class="grid" aria-label="Current research status">
+    <section class="card"><div class="muted small">Best measured speedup</div><div class="metric">—</div><span class="chip">No GPU results yet</span></section>
+    <section class="card"><div class="muted small">Validated throughput</div><div class="metric">—</div><span class="chip">Benchmark unfinished</span></section>
+    <section class="card"><div class="muted small">Experiment stage</div><div class="metric" style="font-size:1.45rem">Foundation</div><span class="chip">Infrastructure + learning</span></section>
+  </div>
+  <h2>Learn by testing a hypothesis</h2>
+  <div class="grid">
+    <section class="card"><h2>1. Understand</h2><p>What does a training step do? Why do batch size, precision and hardware affect speed?</p><a href="/learn">Open the learning lab</a></section>
+    <section class="card"><h2>2. Measure</h2><p>Compare reproducible configurations under the same training workload and loss requirements.</p><a href="/experiments">View tasks and results</a></section>
+    <section class="card"><h2>3. Generalize</h2><p>Test whether changes that help on a development GPU also help on unseen configurations.</p><a href="/research">Read the research protocol</a></section>
+  </div>
+  <p class="muted small">Source: the repository README and task definitions. No model training has been run or inferred by this website.</p>
+</BaseLayout>
