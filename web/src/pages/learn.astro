@@ -1,0 +1,65 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Learn">
+  <div class="eyebrow">Learning lab / Training workload</div>
+  <h1>How many tokens does one optimizer step process?</h1>
+  <p class="lead">Change the micro-batch size to see how many gradient-accumulation steps are required to preserve the same total training work.</p>
+  <section class="card">
+    <div class="chip">Conceptual calculator · not a GPU benchmark</div>
+    <p><strong>Tokens per optimizer step</strong> = micro-batch size × gradient accumulation × GPU count × sequence length.</p>
+    <label for="micro">Micro-batch size: <output id="microValue" for="micro">8</output></label>
+    <input id="micro" type="range" min="1" max="64" value="8" step="1" />
+    <div class="grid">
+      <div><label for="gpus">Number of GPUs</label><input id="gpus" type="number" min="1" max="64" step="1" value="1" /></div>
+      <div><label for="sequence">Sequence length</label><input id="sequence" type="number" min="1" max="65536" step="1" value="1024" /></div>
+      <div><label for="target">Target tokens per optimizer step</label><input id="target" type="number" min="1" step="1" value="524288" /></div>
+    </div>
+    <div class="output" role="status" aria-live="polite">
+      <div class="muted small">Required gradient accumulation</div>
+      <div class="metric" id="accumulation">64</div>
+      <p id="explanation">The total number of tokens remains fixed.</p>
+    </div>
+    <p class="muted small">Only whole-number accumulation steps are allowed. A larger micro-batch may use more GPU memory; this calculator does not estimate speed, memory usage, or training quality.</p>
+  </section>
+  <div class="grid">
+    <section class="card"><h2>Forward pass</h2><p>The model predicts token probabilities from the current input batch.</p></section>
+    <section class="card"><h2>Backward pass</h2><p>Gradients measure how each trainable parameter contributes to prediction error.</p></section>
+    <section class="card"><h2>Optimizer step</h2><p>Accumulated gradients update model parameters. The experiment must keep tokens per step fixed for fair comparisons.</p></section>
+  </div>
+  <p class="small muted">See <a href="https://github.com/mbzuaiciao/throughput-agent/blob/main/harness/validate.py">harness/validate.py</a> for the exact token-budget validation in the Python research code.</p>
+  <script>
+    const micro = document.querySelector<HTMLInputElement>("#micro")!;
+    const gpus = document.querySelector<HTMLInputElement>("#gpus")!;
+    const sequence = document.querySelector<HTMLInputElement>("#sequence")!;
+    const target = document.querySelector<HTMLInputElement>("#target")!;
+    const value = document.querySelector<HTMLOutputElement>("#microValue")!;
+    const accumulation = document.querySelector<HTMLElement>("#accumulation")!;
+    const explanation = document.querySelector<HTMLElement>("#explanation")!;
+    function positiveInteger(input: HTMLInputElement): number | null {
+      const x = Number(input.value);
+      return Number.isSafeInteger(x) && x > 0 ? x : null;
+    }
+    function render() {
+      const mb = positiveInteger(micro), n = positiveInteger(gpus);
+      const seq = positiveInteger(sequence), tokens = positiveInteger(target);
+      value.textContent = String(mb ?? "—");
+      if (mb === null || n === null || seq === null || tokens === null) {
+        accumulation.textContent = "—";
+        explanation.textContent = "Use positive whole numbers for every input.";
+        return;
+      }
+      const tokensPerMicro = mb * n * seq;
+      const steps = tokens / tokensPerMicro;
+      if (!Number.isSafeInteger(tokensPerMicro) || !Number.isSafeInteger(steps) || steps < 1) {
+        accumulation.textContent = "Not possible";
+        explanation.textContent = "This configuration cannot preserve the target workload with a whole-number accumulation count.";
+      } else {
+        accumulation.textContent = steps.toLocaleString();
+        explanation.textContent = `${mb} × ${steps.toLocaleString()} × ${n} × ${seq.toLocaleString()} = ${tokens.toLocaleString()} tokens per optimizer step.`;
+      }
+    }
+    [micro, gpus, sequence, target].forEach(input => input.addEventListener("input", render));
+    render();
+  </script>
+</BaseLayout>

@@ -1,0 +1,24 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { tasks } from "../lib/tasks";
+---
+<BaseLayout title="Experiments">
+  <div class="eyebrow">Experiments / Task definitions</div>
+  <h1>Compare what the agent learns with what transfers.</h1>
+  <p class="lead">These tasks are read at build time from the repository's checked-in task specifications. They describe planned runs, not measured results.</p>
+  <div class="grid">
+    {tasks.map(task => <section class="card">
+      <span class="chip">{task.split.replaceAll("_", " ")}</span>
+      <h2 style="margin-top:14px">{task.model}</h2>
+      <p><strong>{task.n_gpus} × {task.gpu_type}</strong> · {task.seq_len.toLocaleString()} tokens/sequence</p>
+      <p class="small muted">{task.global_batch_tokens.toLocaleString()} tokens per optimizer step · {task.attempt_budget} proposals allowed</p>
+      <p class="small muted">Task ID: <code>{task.task_id}</code></p>
+    </section>)}
+  </div>
+  <section class="card">
+    <h2>Measured runs</h2>
+    <div class="metric">—</div>
+    <p>No training benchmark results have been recorded in this project yet. Once experiments run, this view can be extended to read actual JSONL result exports, showing speedup, memory, validation loss, and failures.</p>
+  </section>
+  <p class="small muted">Task source: <a href="https://github.com/mbzuaiciao/throughput-agent/tree/main/tasks">tasks/</a>. No cloud resources are launched by this frontend.</p>
+</BaseLayout>
