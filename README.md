@@ -42,3 +42,15 @@ The base environment intentionally has no heavy runtime dependencies. The test r
 4. Introduce the LLM agent and perform a genuinely held-out evaluation.
 
 See [GitHub Issues](https://github.com/mbzuaiciao/throughput-agent/issues) for scoped coding tasks.
+
+## Learning frontend (Astro)
+
+The static learning site lives under `web/`. It includes an interactive workload calculator, task definitions from the checked-in YAML files, and a research protocol explanation. It does **not** invent benchmark results.
+
+```sh
+cd web
+npm install
+npm run dev
+```
+
+Run `npm run build` to type-check and build the site. The frontend uses npm independently of the Python uv environment. See [web/README.md](web/README.md).
