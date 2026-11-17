@@ -1,0 +1,13 @@
+task_id: gpt2s_1gpu_a100
+split: dev
+model: gpt2-124m
+n_gpus: 1
+gpu_type: A100
+seq_len: 1024
+global_batch_tokens: 524288
+warmup_steps: 10
+timed_steps: 50
+loss_check_steps: 200
+loss_rel_tol: 0.02
+n_repeats: 5
+attempt_budget: 20

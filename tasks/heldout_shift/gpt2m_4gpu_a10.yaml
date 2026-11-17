@@ -1,0 +1,13 @@
+task_id: gpt2m_4gpu_a10
+split: heldout_shift      # differs from every dev task in model size, GPU type and GPU count
+model: gpt2-350m
+n_gpus: 4
+gpu_type: A10
+seq_len: 2048
+global_batch_tokens: 524288
+warmup_steps: 10
+timed_steps: 50
+loss_check_steps: 200
+loss_rel_tol: 0.02
+n_repeats: 5
+attempt_budget: 20
