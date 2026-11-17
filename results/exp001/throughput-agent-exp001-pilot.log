@@ -1,0 +1,15 @@
+[{"stream_name":"stdout","time":12.548279401,"data":"GPU: Tesla T4 torch: 2.11.0+cu130\n"}
+,{"stream_name":"stdout","time":12.548346913,"data":"Running seed=1234 micro_batch=4\n"}
+,{"stream_name":"stdout","time":21.254596761,"data":"Running seed=1234 micro_batch=8\n"}
+,{"stream_name":"stdout","time":21.721682786,"data":"Running seed=1234 micro_batch=16\n"}
+,{"stream_name":"stdout","time":22.137014901,"data":"Running seed=1235 micro_batch=4\n"}
+,{"stream_name":"stdout","time":22.726908947,"data":"Running seed=1235 micro_batch=8\n"}
+,{"stream_name":"stdout","time":23.163467924,"data":"Running seed=1235 micro_batch=16\n"}
+,{"stream_name":"stdout","time":23.577194455,"data":"Saved: /kaggle/working/exp001.json\n"}
+,{"stream_name":"stderr","time":29.704979027,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":29.705032756,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":30.023135705,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":30.023181937,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":30.869263524,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":31.984241372,"data":"[NbConvertApp] Writing 325790 bytes to __results__.html\n"}
+]
