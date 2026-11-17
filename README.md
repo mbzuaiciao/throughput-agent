@@ -1,31 +1,44 @@
 # throughput-agent
 
-Does an LLM agent find training-throughput gains that **generalize to held-out setups**, or does it overfit the dev set?
-Same question as the AFML harness, applied to a systems objective.
+**Research question:** Does an LLM agent discover training-throughput improvements that generalize to unfamiliar model and GPU configurations, or does it overfit development tasks?
 
-## Layout
-- `harness/` evaluator-owned: schema, static validation, measurement, held-out ledger. Agent code never imports `evaluator.py`.
-- `bench/entry.py` evaluator-owned timing entrypoint (frozen by manifest).
-- `train/` vendored nanoGPT-style code. Only `train/hooks/*.py` is agent-writable (free-form arm).
-- `agent/` loop and baselines (random search now; add BO/evolutionary and the LLM agent).
-- `tasks/{dev,heldout,heldout_shift}/` task specs. Shift tasks differ in model size, GPU type and GPU count.
-- `analysis/stats.py` bootstrap CIs and the dev-vs-held-out gap statistic.
-- `results/` JSONL logs (every proposal and full result).
+The repo is currently **a research scaffold, not a completed GPU benchmark**. `bench/entry.py` still contains TODOs and the experiment does not yet have measured throughput results.
 
-## Protocol
-1. Develop the agent scaffold (prompts, memory, parameters) on dev tasks only.
-2. Freeze it: `scaffold_hash(...)`. Held-out is scored once per hash via `HeldoutLedger.claim`.
-3. On held-out tasks the agent gets within-task feedback (same attempt budget as the baselines), but the scaffold is fixed.
-4. Rejected or failed attempts count as speedup 1.0. Report CIs, dev-to-held-out gap, failure taxonomy, $/task.
+## Start here
 
-## Known limits (state them in the write-up)
-- Free-form patches run in the same process as the timer. Mitigations: CUDA-event vs wall-clock agreement, loss guardrail, token-budget equality, frozen entrypoint. Not a proof of integrity.
-- ~6 held-out tasks means wide CIs: pilot-scale result.
+Python tooling uses [uv](https://docs.astral.sh/uv/). From the repository root:
 
-## Order of work
-1. Vendor nanoGPT; implement the `bench/entry.py` TODOs; confirm timing variance <2-3% on one task.
-2. Baselines: untouched, hand-tuned, random, BO. Write `baselines.json` for the Evaluator.
-3. Freeze step (hash frozen files into the manifest, resolve task YAMLs to `tasks/resolved/*.json`), then the LLM agent.
-4. Held-out run, analysis, write-up.
+```sh
+uv sync --locked
+uv run --with pytest==9.0.2 python -m pytest -q tests
+```
 
-Run tests: `PYTHONPATH=. python -m pytest -q tests`
+The base environment intentionally has no heavy runtime dependencies. The test runner is supplied using `uv run --with`; that runner is pinned in the command but is **not included in uv.lock**. GPU-training dependencies (PyTorch/CUDA) will be added when the benchmark is implemented and pinned for a specific training environment. Nothing automatically provisions or rents a GPU.
+
+## Repository guide
+
+- `harness/`: evaluator-owned task schema, config/patch validation, measurement and held-out ledger. Agent code must never import evaluator internals.
+- `bench/entry.py`: frozen training/timing entrypoint; currently unfinished.
+- `train/`: training implementation and the limited agent-writable `train/hooks/` area.
+- `agent/`: search loop and baselines (random search is present; LLM agent and BO are not yet implemented).
+- `tasks/`: dev and shifted held-out task specifications.
+- `analysis/`: statistics for bootstrap intervals and dev-to-held-out generalization.
+- `tests/`: static/unit tests.
+
+## Evaluation protocol
+
+1. Develop the agent scaffold on development tasks only.
+2. Freeze prompts, memory and search policy; record their hash.
+3. Run the frozen agent on held-out tasks, allowing within-task feedback under the same attempt budget as baselines.
+4. Report throughput speedups, loss validity, failures, uncertainty and dev-to-held-out gap. Failed or rejected configurations fall back to speedup 1.0 in best-result reporting.
+
+**Known limits:** Agent-writable Python hooks currently execute in the same process as the timer, so the planned timing checks do not prove isolation. A small held-out set supports pilot conclusions only.
+
+## Next milestones
+
+1. Establish a reproducible Python environment and learning-focused Astro frontend.
+2. Complete a single-GPU reference benchmark with trustworthy timing and loss checks.
+3. Compare untouched, manually tuned and random-search configurations.
+4. Introduce the LLM agent and perform a genuinely held-out evaluation.
+
+See [GitHub Issues](https://github.com/mbzuaiciao/throughput-agent/issues) for scoped coding tasks.
