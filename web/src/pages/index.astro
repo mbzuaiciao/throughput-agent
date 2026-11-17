@@ -1,23 +1,25 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import pilot from "../../../results/exp001/exp001.json";
-const best = Math.max(...pilot.summary.filter(row => row.status === "accepted").map(row => row.speedup ?? 0));
-const completed = pilot.runs.filter(run => run.status === "ok").length;
+import first from "../../../results/exp001/exp001.json";
+import second from "../../../results/exp002/exp002.json";
+const best = second.summary.find(row => row.micro_batch_size === 16)?.speedup ?? 0;
+const success = [first,second].reduce((n,e)=>n+e.runs.filter(r=>r.status==="ok").length,0);
+const total = first.runs.length + second.runs.length;
 ---
 <BaseLayout title="Overview">
   <div class="eyebrow">Research lab / Overview</div>
   <h1>Can AI agents discover training speedups that transfer?</h1>
   <p class="lead">This project tests whether an optimization agent improves neural-network training throughput on unfamiliar models and GPUs—not just on the development cases it has already seen.</p>
   <div class="grid" aria-label="Current research status">
-    <section class="card"><div class="muted small">Best observed pilot speedup</div><div class="metric">{best.toFixed(2)}×</div><span class="chip">Synthetic-data pilot only</span></section>
-    <section class="card"><div class="muted small">Successful GPU pilot runs</div><div class="metric">{completed}/{pilot.runs.length}</div><span class="chip">Kaggle Tesla T4</span></section>
-    <section class="card"><div class="muted small">Experiment stage</div><div class="metric" style="font-size:1.45rem">Pilot measured</div><span class="chip">Full benchmark pending</span></section>
+    <section class="card"><div class="muted small">EXP-002 observed speedup</div><div class="metric">{best.toFixed(2)}×</div><span class="chip">Small-model pilot only</span></section>
+    <section class="card"><div class="muted small">Successful GPU pilot runs</div><div class="metric">{success}/{total}</div><span class="chip">EXP-001 and EXP-002</span></section>
+    <section class="card"><div class="muted small">Research stage</div><div class="metric" style="font-size:1.45rem">Pilots measured</div><span class="chip">Full benchmark pending</span></section>
   </div>
   <h2>Learn by testing a hypothesis</h2>
   <div class="grid">
     <section class="card"><h2>1. Understand</h2><p>What does a training step do? Why do batch size, precision and hardware affect speed?</p><a href="/learn">Open the learning lab</a></section>
-    <section class="card"><h2>2. Measure</h2><p>Compare reproducible configurations under the same training workload and loss requirements. Our first Kaggle pilot has completed.</p><a href="/experiments">View measured results</a></section>
-    <section class="card"><h2>3. Generalize</h2><p>Test whether changes that help on a development GPU also help on unseen configurations. This question is not answered by the pilot.</p><a href="/research">Read the research protocol</a></section>
+    <section class="card"><h2>2. Measure</h2><p>Compare two Kaggle pilot measurements using fixed training workloads and validation-loss checks.</p><a href="/experiments">Compare EXP-001 and EXP-002</a></section>
+    <section class="card"><h2>3. Generalize</h2><p>Test whether changes that help on a development GPU also help on unseen configurations. The pilots do not answer that yet.</p><a href="/research">Read the research protocol</a></section>
   </div>
-  <p class="muted small">The pilot uses a small Transformer, synthetic tokens and very short measurement intervals. Source: committed <a href="https://github.com/mbzuaiciao/throughput-agent/blob/main/results/exp001/exp001.json">EXP-001 Kaggle JSON</a>.</p>
+  <p class="muted small">Results are from small synthetic-data pilots on one Tesla T4 GPU; they are not agent optimization or held-out results.</p>
 </BaseLayout>

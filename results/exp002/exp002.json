@@ -1,0 +1,215 @@
+{
+  "experiment_id": "exp002-kaggle-longer-timing",
+  "status": "longer_timing_pilot_not_final_gpt2",
+  "generated_at_utc": "2026-11-17T22:59:04.954838+00:00",
+  "hardware": {
+    "gpu": "Tesla T4",
+    "visible_gpu_count": 2,
+    "torch": "2.11.0+cu130",
+    "python": "3.13.16"
+  },
+  "model": "4-layer 256-wide causal transformer, ~4M parameters",
+  "data": "fixed-seed synthetic uniform token IDs; no external downloads",
+  "workload": {
+    "seq_len": 128,
+    "tokens_per_step": 8192,
+    "warmup_steps": 5,
+    "timed_steps": 40,
+    "repeats": 3,
+    "precision": "fp32",
+    "optimizer": "AdamW lr=1e-3"
+  },
+  "runs": [
+    {
+      "seed": 1234,
+      "config": {
+        "micro_batch_size": 4,
+        "grad_accum_steps": 16
+      },
+      "tokens_per_step": 8192,
+      "timed_optimizer_steps": 40,
+      "timed_tokens": 327680,
+      "cuda_seconds": 4.10948388671875,
+      "wall_seconds": 4.111462308,
+      "tokens_per_second": 79737.50695531713,
+      "wall_tokens_per_second": 79699.13754588165,
+      "peak_allocated_gb": 0.132946944,
+      "validation_loss": 19.10580825805664,
+      "status": "ok",
+      "execution_order": 0
+    },
+    {
+      "seed": 1234,
+      "config": {
+        "micro_batch_size": 8,
+        "grad_accum_steps": 8
+      },
+      "tokens_per_step": 8192,
+      "timed_optimizer_steps": 40,
+      "timed_tokens": 327680,
+      "cuda_seconds": 2.823825439453125,
+      "wall_seconds": 2.823874045000025,
+      "tokens_per_second": 116041.16721303426,
+      "wall_tokens_per_second": 116039.16987026845,
+      "peak_allocated_gb": 0.185576448,
+      "validation_loss": 19.10580825805664,
+      "status": "ok",
+      "execution_order": 1
+    },
+    {
+      "seed": 1234,
+      "config": {
+        "micro_batch_size": 16,
+        "grad_accum_steps": 4
+      },
+      "tokens_per_step": 8192,
+      "timed_optimizer_steps": 40,
+      "timed_tokens": 327680,
+      "cuda_seconds": 2.6193916015625,
+      "wall_seconds": 2.6194475529999863,
+      "tokens_per_second": 125097.7516323007,
+      "wall_tokens_per_second": 125095.0795425228,
+      "peak_allocated_gb": 0.287427584,
+      "validation_loss": 19.10580825805664,
+      "status": "ok",
+      "execution_order": 2
+    },
+    {
+      "seed": 1235,
+      "config": {
+        "micro_batch_size": 16,
+        "grad_accum_steps": 4
+      },
+      "tokens_per_step": 8192,
+      "timed_optimizer_steps": 40,
+      "timed_tokens": 327680,
+      "cuda_seconds": 2.62957275390625,
+      "wall_seconds": 2.6296288070000173,
+      "tokens_per_second": 124613.39946317473,
+      "wall_tokens_per_second": 124610.74320745295,
+      "peak_allocated_gb": 0.287427584,
+      "validation_loss": 18.379405975341797,
+      "status": "ok",
+      "execution_order": 0
+    },
+    {
+      "seed": 1235,
+      "config": {
+        "micro_batch_size": 8,
+        "grad_accum_steps": 8
+      },
+      "tokens_per_step": 8192,
+      "timed_optimizer_steps": 40,
+      "timed_tokens": 327680,
+      "cuda_seconds": 2.86053369140625,
+      "wall_seconds": 2.8605730520000634,
+      "tokens_per_second": 114552.05054372606,
+      "wall_tokens_per_second": 114550.4743432061,
+      "peak_allocated_gb": 0.185576448,
+      "validation_loss": 18.379405975341797,
+      "status": "ok",
+      "execution_order": 1
+    },
+    {
+      "seed": 1235,
+      "config": {
+        "micro_batch_size": 4,
+        "grad_accum_steps": 16
+      },
+      "tokens_per_step": 8192,
+      "timed_optimizer_steps": 40,
+      "timed_tokens": 327680,
+      "cuda_seconds": 4.11237158203125,
+      "wall_seconds": 4.112388140000007,
+      "tokens_per_second": 79681.51551084955,
+      "wall_tokens_per_second": 79681.19468411837,
+      "peak_allocated_gb": 0.135044096,
+      "validation_loss": 18.379405975341797,
+      "status": "ok",
+      "execution_order": 2
+    },
+    {
+      "seed": 1236,
+      "config": {
+        "micro_batch_size": 16,
+        "grad_accum_steps": 4
+      },
+      "tokens_per_step": 8192,
+      "timed_optimizer_steps": 40,
+      "timed_tokens": 327680,
+      "cuda_seconds": 2.67209423828125,
+      "wall_seconds": 2.6721433609999394,
+      "tokens_per_second": 122630.40550948946,
+      "wall_tokens_per_second": 122628.15116228617,
+      "peak_allocated_gb": 0.287427584,
+      "validation_loss": 17.68038558959961,
+      "status": "ok",
+      "execution_order": 0
+    },
+    {
+      "seed": 1236,
+      "config": {
+        "micro_batch_size": 4,
+        "grad_accum_steps": 16
+      },
+      "tokens_per_step": 8192,
+      "timed_optimizer_steps": 40,
+      "timed_tokens": 327680,
+      "cuda_seconds": 4.064365966796875,
+      "wall_seconds": 4.064395702999946,
+      "tokens_per_second": 80622.66111785315,
+      "wall_tokens_per_second": 80622.0712609597,
+      "peak_allocated_gb": 0.135044096,
+      "validation_loss": 17.680387496948242,
+      "status": "ok",
+      "execution_order": 1
+    },
+    {
+      "seed": 1236,
+      "config": {
+        "micro_batch_size": 8,
+        "grad_accum_steps": 8
+      },
+      "tokens_per_step": 8192,
+      "timed_optimizer_steps": 40,
+      "timed_tokens": 327680,
+      "cuda_seconds": 2.913941650390625,
+      "wall_seconds": 2.9139825990000645,
+      "tokens_per_second": 112452.4919557237,
+      "wall_tokens_per_second": 112450.91172213714,
+      "peak_allocated_gb": 0.185576448,
+      "validation_loss": 17.68038558959961,
+      "status": "ok",
+      "execution_order": 2
+    }
+  ],
+  "summary": [
+    {
+      "micro_batch_size": 4,
+      "status": "accepted",
+      "median_tps": 79737.50695531713,
+      "median_loss": 18.379405975341797,
+      "relative_loss_change": 0.0,
+      "max_timing_difference": 0.0004811965021302932,
+      "speedup": 1.0
+    },
+    {
+      "micro_batch_size": 8,
+      "status": "accepted",
+      "median_tps": 114552.05054372606,
+      "median_loss": 18.379405975341797,
+      "relative_loss_change": 0.0,
+      "max_timing_difference": 1.7212363627297066e-05,
+      "speedup": 1.4366143978882875
+    },
+    {
+      "micro_batch_size": 16,
+      "status": "accepted",
+      "median_tps": 124613.39946317473,
+      "median_loss": 18.379405975341797,
+      "relative_loss_change": 0.0,
+      "max_timing_difference": 2.1360014413034614e-05,
+      "speedup": 1.5627952794285995
+    }
+  ]
+}
