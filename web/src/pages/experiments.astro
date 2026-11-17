@@ -1,11 +1,54 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { tasks } from "../lib/tasks";
+import pilot from "../../../results/exp001/exp001.json";
+
+const formatInt = (n: number) => Math.round(n).toLocaleString("en-US");
+const formats = pilot.summary.map(item => {
+  const rows = pilot.runs.filter(run => run.config.micro_batch_size === item.micro_batch_size && run.status === "ok");
+  return {
+    ...item,
+    completed: rows.length,
+    memory: rows.length ? Math.max(...rows.map(run => run.peak_allocated_gb)) : null,
+    accumulation: rows[0]?.config.grad_accum_steps ?? null,
+  };
+});
+const best = formats.filter(row => row.status === "accepted" && row.speedup !== null)
+  .reduce<number>((max, row) => Math.max(max, row.speedup ?? 0), 0);
 ---
 <BaseLayout title="Experiments">
-  <div class="eyebrow">Experiments / Task definitions</div>
-  <h1>Compare what the agent learns with what transfers.</h1>
-  <p class="lead">These tasks are read at build time from the repository's checked-in task specifications. They describe planned runs, not measured results.</p>
+  <div class="eyebrow">Experiments / Measured pilot</div>
+  <h1>What changed when the micro-batch got larger?</h1>
+  <p class="lead">EXP-001 is our first measured Kaggle pilot, using synthetic tokens and a small causal Transformer. It compares three configurations on one Tesla T4 GPU while keeping tokens per optimizer step fixed.</p>
+  <div class="grid">
+    <section class="card"><div class="muted small">Best observed pilot speedup</div><div class="metric">{best.toFixed(2)}×</div><span class="chip">Against micro-batch 4</span></section>
+    <section class="card"><div class="muted small">Completed trial runs</div><div class="metric">{pilot.runs.filter(run => run.status === "ok").length}/{pilot.runs.length}</div><span class="chip">{pilot.workload.repeats} seeds per configuration</span></section>
+    <section class="card"><div class="muted small">Hardware</div><div class="metric" style="font-size:1.6rem">{pilot.hardware.gpu}</div><span class="chip">One GPU used</span></section>
+  </div>
+  <section class="card">
+    <h2>Measured training throughput</h2>
+    <p class="muted small">Median CUDA-event tokens/second; higher is better. Bar lengths are proportional to the fastest measured configuration.</p>
+    {formats.map(row => <div style="margin:20px 0">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <strong>Micro-batch {row.micro_batch_size}</strong>
+        <span>{row.median_tps === undefined ? "Incomplete" : formatInt(row.median_tps)} tokens/sec</span>
+      </div>
+      <div style="height:13px;background:var(--soft);border-radius:10px;overflow:hidden;margin:9px 0" role="img" aria-label={`Micro-batch ${row.micro_batch_size}: ${row.median_tps ? formatInt(row.median_tps) : "no"} tokens per second`}>
+        <div style={`height:100%;background:var(--blue);border-radius:10px;width:${row.median_tps ? (100 * row.median_tps / Math.max(...formats.map(r => r.median_tps ?? 0))).toFixed(1) : 0}%`}></div>
+      </div>
+      <p class="muted small" style="margin:0">Accumulation: {row.accumulation ?? "—"} · Peak allocated memory: {row.memory?.toFixed(3) ?? "—"} GB · Speedup: {row.speedup?.toFixed(2) ?? "—"}× · {row.completed} successful runs</p>
+    </div>)}
+    <p class="small muted">All three configurations satisfied this pilot's loss and timing checks. Each candidate processed {pilot.workload.tokens_per_step.toLocaleString("en-US")} tokens per optimizer step.</p>
+  </section>
+  <section class="card" style="margin-top:20px">
+    <h2>How should we interpret this?</h2>
+    <p>Increasing the micro-batch reduced the number of gradient accumulation passes required for an optimizer step. This may reduce overhead, but it increased measured peak GPU memory.</p>
+    <p><strong>Limitations:</strong> This is exploratory evidence only: {pilot.workload.timed_steps} timed optimizer steps per run, {pilot.workload.repeats} seeds, fixed synthetic data, and one GPU. The checks are not an independent security boundary. We have not tested the full GPT-2 benchmark or whether an LLM agent's gains generalize to held-out hardware.</p>
+    <p class="small"><a href="https://github.com/mbzuaiciao/throughput-agent/blob/main/results/exp001/exp001.json">Inspect the source results JSON</a></p>
+  </section>
+  <hr />
+  <h2>Planned benchmark tasks</h2>
+  <p class="muted">The following task definitions describe future research experiments. They are separate from the completed Kaggle pilot.</p>
   <div class="grid">
     {tasks.map(task => <section class="card">
       <span class="chip">{task.split.replaceAll("_", " ")}</span>
@@ -15,10 +58,5 @@ import { tasks } from "../lib/tasks";
       <p class="small muted">Task ID: <code>{task.task_id}</code></p>
     </section>)}
   </div>
-  <section class="card">
-    <h2>Measured runs</h2>
-    <div class="metric">—</div>
-    <p>No training benchmark results have been recorded in this project yet. Once experiments run, this view can be extended to read actual JSONL result exports, showing speedup, memory, validation loss, and failures.</p>
-  </section>
-  <p class="small muted">Task source: <a href="https://github.com/mbzuaiciao/throughput-agent/tree/main/tasks">tasks/</a>. No cloud resources are launched by this frontend.</p>
+  <p class="small muted">This is a static, read-only view of committed data. It does not initiate Kaggle or cloud jobs.</p>
 </BaseLayout>

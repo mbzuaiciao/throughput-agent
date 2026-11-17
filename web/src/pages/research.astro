@@ -13,7 +13,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   </div>
   <section class="card">
     <h2>Current status and limitations</h2>
-    <p>The benchmark entrypoint is not implemented, the LLM agent is not present, and no throughput claims have been established. Existing checks are a useful starting point but do not yet prove isolation from agent-controlled code.</p>
+    <p>The first Kaggle T4 GPU measurement pilot completed successfully and its real results appear in <a href="/experiments">Experiments</a>. It used a small model, synthetic data, two seeds and only three timed optimizer steps per configuration. It is evidence that the execution and data-collection workflow works, not evidence that an agent discovers generalizable speedups.</p>
+    <p>The full GPT-2 benchmark entrypoint and the LLM agent remain unfinished. Timing checks are currently in-process and do not prove isolation from agent-controlled code.</p>
     <p><a href="https://github.com/mbzuaiciao/throughput-agent">Inspect the source and open issues</a></p>
   </section>
 </BaseLayout>
