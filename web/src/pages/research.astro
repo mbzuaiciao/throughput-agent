@@ -13,8 +13,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   </div>
   <section class="card">
     <h2>Current status</h2>
-    <p>EXP-001 and EXP-002 completed on Kaggle's Tesla T4 with a small Transformer and synthetic token data. EXP-002 extended the measurement window from 3 to 40 optimizer steps and used three seeds. The observed ~1.56× throughput ratio persisted in that pilot.</p>
-    <p>Neither experiment included an LLM optimization agent, a larger GPT-2 training model, nor a held-out hardware generalization test. Timing checks are currently in-process, not a proof of evaluator isolation.</p>
+    <p>EXP-001 and EXP-002 completed on Kaggle's Tesla T4 with a small Transformer and synthetic token data. EXP-003 increased model size to 15,032,064 parameters on the same GPU. Micro-batch 16 remained fastest, but its observed advantage over micro-batch 4 declined from about 1.56× to 1.13×.</p>
+    <p>None of these experiments included an LLM optimization agent, the full GPT-2 124M training benchmark, or a held-out hardware generalization test. Timing checks are currently in-process, not a proof of evaluator isolation.</p>
     <p><a href="/experiments">Examine the measured comparisons</a></p>
   </section>
 </BaseLayout>
