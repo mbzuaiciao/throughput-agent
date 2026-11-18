@@ -1,0 +1,317 @@
+{
+  "experiment_id": "exp004-bottleneck-profile",
+  "status": "diagnostic_not_throughput_benchmark",
+  "generated_at_utc": "2026-11-18T01:22:20.761147+00:00",
+  "hardware": {
+    "gpu": "Tesla T4",
+    "torch": "2.11.0+cu130",
+    "python": "3.13.16"
+  },
+  "workload": {
+    "sequence_length": 128,
+    "tokens_per_step": 8192,
+    "warmup_steps": 2,
+    "profiled_steps": 2,
+    "precision": "fp32",
+    "seed": 1234,
+    "data": "synthetic token IDs"
+  },
+  "results": [
+    {
+      "config": {
+        "model": "small",
+        "layers": 4,
+        "width": 256,
+        "heads": 4,
+        "micro_batch_size": 4,
+        "grad_accum_steps": 16,
+        "tokens_per_step": 8192
+      },
+      "seed": 1234,
+      "parameter_count": 3716608,
+      "profiled_steps": 2,
+      "instrumented_wall_seconds": 0.7605922900000053,
+      "phase_cuda_event_ms": {
+        "forward": 125.62095975875854,
+        "backward": 276.96137619018555,
+        "optimizer": 4.077568054199219
+      },
+      "top_cuda_operators": [
+        {
+          "name": "training_forward",
+          "self_cuda_ms": 119.08489999999995,
+          "calls": 32
+        },
+        {
+          "name": "aten::mm",
+          "self_cuda_ms": 66.16984599999955,
+          "calls": 1120
+        },
+        {
+          "name": "aten::addmm",
+          "self_cuda_ms": 30.635704000000448,
+          "calls": 512
+        },
+        {
+          "name": "volta_sgemm_128x64_nn",
+          "self_cuda_ms": 27.580167999999805,
+          "calls": 416
+        },
+        {
+          "name": "volta_sgemm_128x64_nt",
+          "self_cuda_ms": 20.65940800000004,
+          "calls": 288
+        },
+        {
+          "name": "volta_sgemm_128x64_tn",
+          "self_cuda_ms": 17.454832000000234,
+          "calls": 256
+        },
+        {
+          "name": "aten::_efficient_attention_backward",
+          "self_cuda_ms": 13.074790000000153,
+          "calls": 128
+        },
+        {
+          "name": "fmha_cutlassB_f32_aligned_64x64_k64_sm75(PyTorchMemEffAttention::AttentionBackwardKernel<cutlass::arch::Sm75, float, true, false, false, 64, 64, 64, false>::Params)",
+          "self_cuda_ms": 13.074790000000153,
+          "calls": 128
+        },
+        {
+          "name": "volta_sgemm_128x128_tn",
+          "self_cuda_ms": 12.76459099999976,
+          "calls": 160
+        },
+        {
+          "name": "aten::sum",
+          "self_cuda_ms": 10.245889999999276,
+          "calls": 672
+        }
+      ],
+      "peak_allocated_gb": 0.13110528,
+      "status": "ok"
+    },
+    {
+      "config": {
+        "model": "small",
+        "layers": 4,
+        "width": 256,
+        "heads": 4,
+        "micro_batch_size": 16,
+        "grad_accum_steps": 4,
+        "tokens_per_step": 8192
+      },
+      "seed": 1234,
+      "parameter_count": 3716608,
+      "profiled_steps": 2,
+      "instrumented_wall_seconds": 0.2083169150000117,
+      "phase_cuda_event_ms": {
+        "forward": 46.51814365386963,
+        "backward": 96.73875331878662,
+        "optimizer": 2.590016007423401
+      },
+      "top_cuda_operators": [
+        {
+          "name": "aten::mm",
+          "self_cuda_ms": 63.630479000000065,
+          "calls": 280
+        },
+        {
+          "name": "training_forward",
+          "self_cuda_ms": 46.38220799999997,
+          "calls": 8
+        },
+        {
+          "name": "volta_sgemm_128x64_tn",
+          "self_cuda_ms": 33.34053300000001,
+          "calls": 136
+        },
+        {
+          "name": "aten::addmm",
+          "self_cuda_ms": 29.194512000000014,
+          "calls": 128
+        },
+        {
+          "name": "volta_sgemm_128x64_nt",
+          "self_cuda_ms": 27.653026000000068,
+          "calls": 136
+        },
+        {
+          "name": "volta_sgemm_128x64_nn",
+          "self_cuda_ms": 21.297621999999915,
+          "calls": 72
+        },
+        {
+          "name": "aten::_efficient_attention_backward",
+          "self_cuda_ms": 13.800418999999966,
+          "calls": 32
+        },
+        {
+          "name": "fmha_cutlassB_f32_aligned_64x64_k64_sm75(PyTorchMemEffAttention::AttentionBackwardKernel<cutlass::arch::Sm75, float, true, false, false, 64, 64, 64, false>::Params)",
+          "self_cuda_ms": 13.800418999999966,
+          "calls": 32
+        },
+        {
+          "name": "volta_sgemm_64x64_nn",
+          "self_cuda_ms": 7.518936000000018,
+          "calls": 32
+        },
+        {
+          "name": "aten::sum",
+          "self_cuda_ms": 5.256176999999916,
+          "calls": 168
+        }
+      ],
+      "peak_allocated_gb": 0.284013056,
+      "status": "ok"
+    },
+    {
+      "config": {
+        "model": "large",
+        "layers": 8,
+        "width": 384,
+        "heads": 6,
+        "micro_batch_size": 4,
+        "grad_accum_steps": 16,
+        "tokens_per_step": 8192
+      },
+      "seed": 1234,
+      "parameter_count": 15032064,
+      "profiled_steps": 2,
+      "instrumented_wall_seconds": 1.2139534769999898,
+      "phase_cuda_event_ms": {
+        "forward": 211.26524877548218,
+        "backward": 518.6147212982178,
+        "optimizer": 11.991936206817627
+      },
+      "top_cuda_operators": [
+        {
+          "name": "training_forward",
+          "self_cuda_ms": 207.01773999999978,
+          "calls": 32
+        },
+        {
+          "name": "aten::mm",
+          "self_cuda_ms": 195.56699499999678,
+          "calls": 2144
+        },
+        {
+          "name": "aten::addmm",
+          "self_cuda_ms": 97.42670099999886,
+          "calls": 1024
+        },
+        {
+          "name": "volta_sgemm_128x64_nn",
+          "self_cuda_ms": 86.282949999999,
+          "calls": 800
+        },
+        {
+          "name": "volta_sgemm_128x64_nt",
+          "self_cuda_ms": 83.09692999999966,
+          "calls": 800
+        },
+        {
+          "name": "volta_sgemm_128x64_tn",
+          "self_cuda_ms": 74.79079400000046,
+          "calls": 768
+        },
+        {
+          "name": "aten::_efficient_attention_backward",
+          "self_cuda_ms": 40.465633999999795,
+          "calls": 256
+        },
+        {
+          "name": "fmha_cutlassB_f32_aligned_64x64_k64_sm75(PyTorchMemEffAttention::AttentionBackwardKernel<cutlass::arch::Sm75, float, true, false, false, 64, 64, 64, false>::Params)",
+          "self_cuda_ms": 40.465633999999795,
+          "calls": 256
+        },
+        {
+          "name": "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul> >(int, at::native::CUDAFunctor_add<float>, std::array<char*, 3ul>)",
+          "self_cuda_ms": 28.144110000001838,
+          "calls": 4056
+        },
+        {
+          "name": "volta_sgemm_128x128_tn",
+          "self_cuda_ms": 27.480487999999642,
+          "calls": 288
+        }
+      ],
+      "peak_allocated_gb": 0.390631936,
+      "status": "ok"
+    },
+    {
+      "config": {
+        "model": "large",
+        "layers": 8,
+        "width": 384,
+        "heads": 6,
+        "micro_batch_size": 16,
+        "grad_accum_steps": 4,
+        "tokens_per_step": 8192
+      },
+      "seed": 1234,
+      "parameter_count": 15032064,
+      "profiled_steps": 2,
+      "instrumented_wall_seconds": 0.6167222359999869,
+      "phase_cuda_event_ms": {
+        "forward": 154.52681732177734,
+        "backward": 334.8969612121582,
+        "optimizer": 10.168831825256348
+      },
+      "top_cuda_operators": [
+        {
+          "name": "aten::mm",
+          "self_cuda_ms": 241.44856299999944,
+          "calls": 536
+        },
+        {
+          "name": "training_forward",
+          "self_cuda_ms": 153.82627100000005,
+          "calls": 8
+        },
+        {
+          "name": "aten::addmm",
+          "self_cuda_ms": 115.45361900000067,
+          "calls": 256
+        },
+        {
+          "name": "volta_sgemm_128x64_nt",
+          "self_cuda_ms": 113.77645299999963,
+          "calls": 264
+        },
+        {
+          "name": "volta_sgemm_128x64_nn",
+          "self_cuda_ms": 109.86666000000001,
+          "calls": 200
+        },
+        {
+          "name": "volta_sgemm_128x64_tn",
+          "self_cuda_ms": 84.66282000000021,
+          "calls": 200
+        },
+        {
+          "name": "aten::_efficient_attention_backward",
+          "self_cuda_ms": 39.848211999999734,
+          "calls": 64
+        },
+        {
+          "name": "fmha_cutlassB_f32_aligned_64x64_k64_sm75(PyTorchMemEffAttention::AttentionBackwardKernel<cutlass::arch::Sm75, float, true, false, false, 64, 64, 64, false>::Params)",
+          "self_cuda_ms": 39.848211999999734,
+          "calls": 64
+        },
+        {
+          "name": "volta_sgemm_128x128_tn",
+          "self_cuda_ms": 36.66079700000026,
+          "calls": 64
+        },
+        {
+          "name": "Command Buffer Full",
+          "self_cuda_ms": 29.66217699999994,
+          "calls": 672
+        }
+      ],
+      "peak_allocated_gb": 0.75361536,
+      "status": "ok"
+    }
+  ]
+}
