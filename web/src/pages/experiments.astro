@@ -1,24 +1,92 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { tasks } from "../lib/tasks";
+import first from "../../../results/exp001/exp001.json";
+import second from "../../../results/exp002/exp002.json";
+
+const experiments = [
+  { id: "EXP-001", data: first, url: "https://github.com/mbzuaiciao/throughput-agent/blob/main/results/exp001/exp001.json" },
+  { id: "EXP-002", data: second, url: "https://github.com/mbzuaiciao/throughput-agent/blob/main/results/exp002/exp002.json" },
+];
+const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
+const batches = [4, 8, 16];
+const comparisons = batches.map(mb => {
+  const original = first.summary.find(row => row.micro_batch_size === mb);
+  const longer = second.summary.find(row => row.micro_batch_size === mb);
+  const matched = second.runs.filter(row => row.config.micro_batch_size === mb && row.status === "ok");
+  return {
+    mb,
+    originalTps: original?.median_tps ?? null,
+    longerTps: longer?.median_tps ?? null,
+    originalSpeedup: original?.speedup ?? null,
+    longerSpeedup: longer?.speedup ?? null,
+    accumulation: matched[0]?.config.grad_accum_steps ?? null,
+    peakGB: matched.length ? Math.max(...matched.map(row => row.peak_allocated_gb)) : null,
+    completed: matched.length,
+  };
+});
+const maxTps = Math.max(...comparisons.flatMap(row => [row.originalTps ?? 0, row.longerTps ?? 0]));
 ---
 <BaseLayout title="Experiments">
-  <div class="eyebrow">Experiments / Task definitions</div>
-  <h1>Compare what the agent learns with what transfers.</h1>
-  <p class="lead">These tasks are read at build time from the repository's checked-in task specifications. They describe planned runs, not measured results.</p>
+  <div class="eyebrow">Experiments / Kaggle GPU pilots</div>
+  <h1>Does the micro-batch speedup persist?</h1>
+  <p class="lead">Both experiments use the same small causal Transformer, synthetic token data and one Tesla T4 GPU. EXP-002 extends the timed window from 3 to 40 optimizer steps and uses three instead of two seeds.</p>
+
   <div class="grid">
-    {tasks.map(task => <section class="card">
-      <span class="chip">{task.split.replaceAll("_", " ")}</span>
-      <h2 style="margin-top:14px">{task.model}</h2>
-      <p><strong>{task.n_gpus} × {task.gpu_type}</strong> · {task.seq_len.toLocaleString()} tokens/sequence</p>
-      <p class="small muted">{task.global_batch_tokens.toLocaleString()} tokens per optimizer step · {task.attempt_budget} proposals allowed</p>
-      <p class="small muted">Task ID: <code>{task.task_id}</code></p>
-    </section>)}
+    <section class="card"><div class="muted small">EXP-001 best observed speedup</div><div class="metric">{(first.summary.find(s => s.micro_batch_size === 16)?.speedup ?? 0).toFixed(2)}×</div><span class="chip">3 timed steps · 2 seeds</span></section>
+    <section class="card"><div class="muted small">EXP-002 best observed speedup</div><div class="metric">{(second.summary.find(s => s.micro_batch_size === 16)?.speedup ?? 0).toFixed(2)}×</div><span class="chip">40 timed steps · 3 seeds</span></section>
+    <section class="card"><div class="muted small">Successful measured runs</div><div class="metric">{experiments.reduce((n,e)=>n+e.data.runs.filter(r=>r.status==="ok").length,0)}/{experiments.reduce((n,e)=>n+e.data.runs.length,0)}</div><span class="chip">Both experiments</span></section>
   </div>
+
   <section class="card">
-    <h2>Measured runs</h2>
-    <div class="metric">—</div>
-    <p>No training benchmark results have been recorded in this project yet. Once experiments run, this view can be extended to read actual JSONL result exports, showing speedup, memory, validation loss, and failures.</p>
+    <h2>Throughput comparison</h2>
+    <p class="muted small">Median CUDA-event tokens per second. The two bars for each micro-batch size compare EXP-001 (muted) against EXP-002 (blue). Higher is better.</p>
+    {comparisons.map(row => <div style="margin:24px 0">
+      <strong>Micro-batch {row.mb}</strong>
+      <div style="display:grid;grid-template-columns:78px minmax(0,1fr) auto;align-items:center;gap:9px;margin-top:10px">
+        <span class="muted small">EXP-001</span>
+        <div style="height:13px;background:var(--soft);border-radius:10px;overflow:hidden"><div style={`height:100%;background:var(--muted);width:${100*(row.originalTps ?? 0)/maxTps}%;border-radius:10px`}></div></div>
+        <span class="small">{row.originalTps === null ? "—" : fmt(row.originalTps)}</span>
+        <span class="muted small">EXP-002</span>
+        <div style="height:13px;background:var(--soft);border-radius:10px;overflow:hidden"><div style={`height:100%;background:var(--blue);width:${100*(row.longerTps ?? 0)/maxTps}%;border-radius:10px`}></div></div>
+        <span class="small">{row.longerTps === null ? "—" : fmt(row.longerTps)}</span>
+      </div>
+      <p class="small muted" style="margin:8px 0 0">Speedup: {row.originalSpeedup?.toFixed(2) ?? "—"}× / {row.longerSpeedup?.toFixed(2) ?? "—"}× · EXP-002 accumulation: {row.accumulation ?? "—"} · Peak PyTorch allocation: {row.peakGB?.toFixed(3) ?? "—"} GB</p>
+    </div>)}
   </section>
-  <p class="small muted">Task source: <a href="https://github.com/mbzuaiciao/throughput-agent/tree/main/tasks">tasks/</a>. No cloud resources are launched by this frontend.</p>
+
+  <section class="card" style="margin-top:20px">
+    <h2>Inspect the individual EXP-002 runs</h2>
+    <p class="muted small">Throughput (tokens/sec) by seed. Each row was measured on the same GPU with an identical tokens-per-step budget.</p>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;text-align:left">
+        <thead><tr><th style="padding:10px;border-bottom:1px solid var(--line)">Micro-batch</th>{second.workload.repeats && [1234,1235,1236].map(seed => <th style="padding:10px;border-bottom:1px solid var(--line)">Seed {seed}</th>)}</tr></thead>
+        <tbody>{batches.map(mb=><tr>
+          <th style="padding:10px;border-bottom:1px solid var(--line)">{mb}</th>
+          {[1234,1235,1236].map(seed => {
+            const run = second.runs.find(r=>r.seed===seed && r.config.micro_batch_size===mb && r.status==="ok");
+            return <td style="padding:10px;border-bottom:1px solid var(--line)">{run ? fmt(run.tokens_per_second) : "—"}</td>;
+          })}
+        </tr>)}</tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:20px">
+    <h2>Interpretation and limits</h2>
+    <p>Micro-batch 16 remained faster than micro-batch 4 in all three EXP-002 seeds. Reducing gradient accumulation likely lowered repeated per-batch overhead, while larger micro-batches increased GPU memory allocation. The second doubling (8 to 16) delivered a smaller additional throughput gain, consistent with diminishing returns.</p>
+    <p><strong>These are still exploratory measurements:</strong> one GPU, a small model, synthetic training data and only three EXP-002 seeds. The timing checks run inside the benchmark process and are not an independent evaluator. This does not establish performance on larger models, other GPUs or agent-selected optimizations.</p>
+    <p class="small">Source data: {experiments.map((e,i) => <><a href={e.url}>{e.id} JSON</a>{i===0 ? " · " : ""}</>)}</p>
+  </section>
+  <hr />
+  <h2>Planned benchmark tasks</h2>
+  <p class="muted">These are separate from the measured Kaggle pilots and have not been executed.</p>
+  <div class="grid">{tasks.map(task => <section class="card">
+    <span class="chip">{task.split.replaceAll("_", " ")}</span>
+    <h2 style="margin-top:14px">{task.model}</h2>
+    <p><strong>{task.n_gpus} × {task.gpu_type}</strong> · {task.seq_len.toLocaleString()} tokens/sequence</p>
+    <p class="small muted">{task.global_batch_tokens.toLocaleString()} tokens per optimizer step · {task.attempt_budget} proposals allowed</p>
+    <p class="small muted">Task ID: <code>{task.task_id}</code></p>
+  </section>)}</div>
+  <p class="small muted">This page reads committed JSON at build time. It does not launch jobs or modify experiment results.</p>
 </BaseLayout>

@@ -8,12 +8,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   <div class="grid">
     <section class="card"><h2>1. Hold work constant</h2><p>Every configuration must process the same tokens per optimizer step. Reducing the work does not count as a speedup.</p></section>
     <section class="card"><h2>2. Check model quality</h2><p>Compare validation loss at a fixed checkpoint. A large loss regression invalidates the apparent throughput gain.</p></section>
-    <section class="card"><h2>3. Use baselines</h2><p>Compare the proposed agent against an untouched setup, manual tuning and non-LLM search under the same proposal budget.</p></section>
-    <section class="card"><h2>4. Protect held-out tasks</h2><p>Finalize the agent's prompts and search policy on development tasks before evaluating unseen model and GPU combinations.</p></section>
+    <section class="card"><h2>3. Use baselines</h2><p>Compare the agent against an untouched setup, manual tuning and non-LLM search under the same proposal budget.</p></section>
+    <section class="card"><h2>4. Protect held-out tasks</h2><p>Finalize agent prompts and search policy on development tasks before testing unseen model and GPU combinations.</p></section>
   </div>
   <section class="card">
-    <h2>Current status and limitations</h2>
-    <p>The benchmark entrypoint is not implemented, the LLM agent is not present, and no throughput claims have been established. Existing checks are a useful starting point but do not yet prove isolation from agent-controlled code.</p>
-    <p><a href="https://github.com/mbzuaiciao/throughput-agent">Inspect the source and open issues</a></p>
+    <h2>Current status</h2>
+    <p>EXP-001 and EXP-002 completed on Kaggle's Tesla T4 with a small Transformer and synthetic token data. EXP-002 extended the measurement window from 3 to 40 optimizer steps and used three seeds. The observed ~1.56× throughput ratio persisted in that pilot.</p>
+    <p>Neither experiment included an LLM optimization agent, a larger GPT-2 training model, nor a held-out hardware generalization test. Timing checks are currently in-process, not a proof of evaluator isolation.</p>
+    <p><a href="/experiments">Examine the measured comparisons</a></p>
   </section>
 </BaseLayout>
