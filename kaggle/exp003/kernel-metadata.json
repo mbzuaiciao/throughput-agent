@@ -1,0 +1,15 @@
+{
+  "id": "chingchao/throughput-agent-exp003-model-size",
+  "title": "Throughput Agent EXP003 Model Size",
+  "code_file": "exp003.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "false",
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
