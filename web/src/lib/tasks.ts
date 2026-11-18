@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import path from "node:path";
 
 export type TaskSummary = {
   task_id: string;
@@ -14,7 +15,7 @@ export type TaskSummary = {
 function parseSimpleTask(relativePath: string): TaskSummary {
   // Read only trusted, checked-in YAML task specifications.
   // Each task is currently a flat mapping with scalar values and comments.
-  const raw = readFileSync(new URL(relativePath, import.meta.url), "utf-8");
+  const raw = readFileSync(path.resolve(process.cwd(), relativePath), "utf-8");
   const map: Record<string, string> = {};
   for (const line of raw.split(/\r?\n/)) {
     const match = line.match(/^([a-z_]+):\s*([^#]*?)(?:\s*#.*)?$/);
@@ -33,6 +34,6 @@ function parseSimpleTask(relativePath: string): TaskSummary {
 }
 
 export const tasks = [
-  parseSimpleTask("../../../tasks/dev/gpt2s_1gpu_a100.yaml"),
-  parseSimpleTask("../../../tasks/heldout_shift/gpt2m_4gpu_a10.yaml"),
+  parseSimpleTask("../tasks/dev/gpt2s_1gpu_a100.yaml"),
+  parseSimpleTask("../tasks/heldout_shift/gpt2m_4gpu_a10.yaml"),
 ];
