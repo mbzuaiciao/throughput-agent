@@ -67,6 +67,8 @@ def run_probe(client, model: str, max_requests: int = MAX_REQUESTS) -> list[dict
             break
         if proposal is None:
             record["proposal_status"] = agent.last_proposal_status or "unknown"
+            if agent.last_invalid_field is not None:
+                record["invalid_field"] = agent.last_invalid_field
             # A malformed response should not lead to unbounded retries.
             break
         record["proposal_status"] = agent.last_proposal_status or "valid"
