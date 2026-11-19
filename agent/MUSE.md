@@ -30,7 +30,7 @@ After confirming pricing and billing on Meta, *explicitly invoke*:
 uv run --with openai --with python-dotenv python -m agent.muse_probe --live --max-requests 5
 ```
 
-There is no automatic retry. At most five API requests are sent in one invocation. Invalid/duplicate configurations, incomplete answers, or API errors stop early. Outputs summarize response status, token usage, latency and the proposed **nonsecret** configurations. This is not a monetary spending cap; check account pricing before running.
+There is no automatic retry. At most five API requests are sent in one invocation. Invalid/duplicate configurations, incomplete answers, or API errors stop early. Outputs summarize response status, token usage, latency, the specific **nonsecret rejection category** (`explicit_stop`, `invalid_json`, `invalid_response_shape`, `token_budget_mismatch`, `invalid_config`, `duplicate_config`), and valid configurations. Raw model responses and prompts are never logged. This is not a monetary spending cap; check account pricing before running.
 
 The probe uses a minimal JSON Schema to request required config fields; it never treats structured output as equivalent to a valid training workload. Only development tasks are allowed. The current adapter terminates early on invalid proposals; that is an initial limitation rather than an optimization score.
 

@@ -38,7 +38,7 @@ def test_duplicate_ends_without_retrying():
     client = FakeClient([reply(4), reply(4)])
     results = run_probe(client, "muse-spark-1.3")
     assert client.calls == 2
-    assert results[-1]["proposal_status"] == "invalid_or_stop"
+    assert results[-1]["proposal_status"] == "duplicate_config"
 
 
 def test_invalid_token_budget_is_rejected():
@@ -47,7 +47,7 @@ def test_invalid_token_budget_is_rejected():
                       "rationale": "bad"})
     client = FakeClient([bad])
     results = run_probe(client, "muse-spark-1.3")
-    assert len(results) == 1 and results[0]["proposal_status"] == "invalid_or_stop"
+    assert len(results) == 1 and results[0]["proposal_status"] == "token_budget_mismatch"
 
 
 @pytest.mark.parametrize("count", [0, 6])
@@ -59,3 +59,18 @@ def test_invalid_count_rejected(count):
 def test_dev_only_task():
     assert make_dev_task().split == "dev"
     assert make_dev_task().global_batch_tokens == 8192
+
+
+def test_explicit_stop_vs_invalid_json_vs_bad_shape():
+    for reply_text, expected in [
+        ('{"stop": true}', "explicit_stop"),
+        ("this is not JSON", "invalid_json"),
+        ('{"config": {}, "rationale": "bad", "patch": "unexpected"}', "invalid_response_shape"),
+        ('{"config": {"micro_batch_size": 16, "grad_accum_steps": 4, "precision": "illegal", "parallelism": "ddp"}, "rationale": "bad"}', "invalid_config"),
+    ]:
+        client = FakeClient([reply_text])
+        outcome = run_probe(client, "muse-spark-1.3", max_requests=1)
+        assert client.calls == 1
+        assert outcome[0]["proposal_status"] == expected
+        assert "response" not in outcome[0]
+        assert "prompt" not in outcome[0]
