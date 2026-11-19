@@ -74,3 +74,38 @@ def test_explicit_stop_vs_invalid_json_vs_bad_shape():
         assert outcome[0]["proposal_status"] == expected
         assert "response" not in outcome[0]
         assert "prompt" not in outcome[0]
+
+
+@pytest.mark.parametrize(("config", "expected_field"), [
+    ({"micro_batch_size": 16, "grad_accum_steps": 4,
+      "precision": "unsupported", "parallelism": "ddp"}, "precision"),
+    ({"micro_batch_size": 16, "grad_accum_steps": 4,
+      "precision": "fp32", "parallelism": "unknown"}, "parallelism"),
+    ({"micro_batch_size": 999, "grad_accum_steps": 4,
+      "precision": "fp32", "parallelism": "ddp"}, "micro_batch_size"),
+    ({"micro_batch_size": 16, "grad_accum_steps": 4,
+      "precision": "fp32", "parallelism": "ddp", "surprise": "secret"},
+     "unknown_key"),
+    ({"micro_batch_size": 16, "precision": "fp32", "parallelism": "ddp"},
+     "micro_batch_size_or_grad_accum_steps"),
+])
+def test_reports_only_invalid_field_name(config, expected_field):
+    client = FakeClient([json.dumps({"config": config, "rationale": "test"})])
+    outcome = run_probe(client, "muse-spark-1.3", 1)[0]
+    assert outcome["invalid_field"] == expected_field
+    assert "secret" not in json.dumps(outcome)
+    assert "response" not in outcome
+
+
+def test_prompt_describes_allowed_types_and_token_equation():
+    from agent.llm import LLMConfigAgent
+    prompt_data = []
+    agent = LLMConfigAgent(
+        lambda prompt: prompt_data.append(json.loads(prompt)) or '{"stop": true}'
+    )
+    agent.propose(make_dev_task(), [])
+    spec = prompt_data[0]["allowed_config"]
+    assert spec["precision"]["allowed"] == ["bf16", "fp16", "fp32"]
+    assert spec["parallelism"]["allowed"] == ["ddp", "fsdp"]
+    assert spec["grad_accum_steps"]["max"] == 128
+    assert "global_batch_tokens" in prompt_data[0]["token_equation"]

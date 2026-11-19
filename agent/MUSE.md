@@ -35,3 +35,5 @@ There is no automatic retry. At most five API requests are sent in one invocatio
 The probe uses a minimal JSON Schema to request required config fields; it never treats structured output as equivalent to a valid training workload. Only development tasks are allowed. The current adapter terminates early on invalid proposals; that is an initial limitation rather than an optimization score.
 
 **Stop:** Once the connection and proposal validation work, do not expand to optimizing throughput until a trusted GPU evaluator and budget-matched random baseline are available.
+
+The proposal prompt now supplies the exact evaluator-backed allowed types, integer ranges and enumerations, plus the fixed tokens/step equation. When a configuration is invalid, the probe may include `invalid_field` (a known key name, `unknown_key`, or a generic category). No proposed field **values** or raw validation error strings are emitted for rejected responses. This diagnostic does not retrospectively identify the field that caused previous failures.
