@@ -66,10 +66,10 @@ def run_probe(client, model: str, max_requests: int = MAX_REQUESTS) -> list[dict
         if record.get("status") != "completed":
             break
         if proposal is None:
-            record["proposal_status"] = "invalid_or_stop"
+            record["proposal_status"] = agent.last_proposal_status or "unknown"
             # A malformed response should not lead to unbounded retries.
             break
-        record["proposal_status"] = "valid"
+        record["proposal_status"] = agent.last_proposal_status or "valid"
         record["config"] = proposal.config
         history.append({"config": proposal.config, "verdict": "not_evaluated"})
     return reports
